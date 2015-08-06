@@ -1,0 +1,2 @@
+c:\users\asus khadija\documents\visual studio 2013\Projects\LoginNode03\LoginNode03\obj\Debug\LoginNode03.njsprojResolveAssemblyReference.cache
+c:\users\asus khadija\documents\visual studio 2013\Projects\LoginNode03\LoginNode03\bin\Microsoft.NodejsTools.WebRole.dll

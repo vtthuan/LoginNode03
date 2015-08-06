@@ -1,0 +1,32 @@
+﻿block extraHeader
+  script(type='text/javascript', src='js/easyrtc.js')
+  script(type='text/javascript', src='js/alertify.min.js')
+  script(type='text/javascript', src='js/room.js')
+block content
+  button#btnFindRoom(onclick='findRoom()') Find Room
+
+  table
+      tr
+        td                        
+          button#hangupButton(disabled='disabled', onclick='hangup()') Hangup
+      |         
+      tr
+        td
+          #name
+        |             
+        td
+          #room
+      |         
+      tr
+        td
+          | My webcam :
+        |             
+        td
+          | Caller webcam :
+      |         
+      tr
+        td
+          video#selfVideo.easyrtcMirror(autoplay='autoplay', muted='muted', volume='0')
+        |             
+        td
+          video#callerVideo(autoplay='autoplay')
