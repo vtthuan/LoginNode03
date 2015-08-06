@@ -12,8 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>775c3542-7d5d-4842-995f-5bcd906f1090</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>server.js</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -43,6 +42,7 @@
     <Compile Include="public\js\easyrtc.js" />
     <Compile Include="public\js\jquery-2.0.3.min.js" />
     <Compile Include="public\js\room.js" />
+    <Compile Include="public\js\socket.io.js" />
     <Compile Include="routes\article.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\room.js" />

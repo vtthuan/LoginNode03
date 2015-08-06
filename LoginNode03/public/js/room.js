@@ -21,7 +21,6 @@ function findRoom(){
 
 function connect() {
     easyrtc.setVideoDims(640, 480);
-    easyrtc.setCredential({ password : document.getElementById('credentialField').value });
     easyrtc.setRoomOccupantListener(occupantListener);
     easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
     easyrtc.setAcceptChecker(function (easyrtcid, callback) {
@@ -167,8 +166,6 @@ function updatePresence() {
 }
 
 function loginSuccess(easyrtcid) {
-    disable("btnConnect");
-    enable("btnDisconnect");
     selfEasyrtcid = easyrtcid;
     updatePresence();
     document.getElementById("name").innerHTML = "number Id : " + selfEasyrtcid;
@@ -202,5 +199,4 @@ function disconnect() {
 
 function loginFailure(errorCode, message) {
     easyrtc.showError("LOGIN-FAILURE", message);
-    document.getElementById('connectButton').disabled = false;
 }

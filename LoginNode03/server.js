@@ -7,6 +7,8 @@ var express = require('express'),
     path = require('path'),
     mongoose = require('mongoose'),
     passport = require('passport'),
+    io = require("socket.io"),      // web socket external module
+    easyrtc = require("easyrtc"),          // EasyRTC external module
     flash = require('connect-flash'),
     models = require('./models'),    
 
@@ -99,6 +101,11 @@ app.all('*', function (req, res) {
 })
 
 var server = http.createServer(app);
+
+// Start Socket.io so it attaches itself to Express server
+var socketServer = io.listen(server, { "log level": 1 });
+easyrtc.listen(app, socketServer, null);
+
 var boot = function () {
     server.listen(app.get('port'), function () {
         console.info('Express server listening on port ' + app.get('port'));

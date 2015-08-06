@@ -1,9 +1,13 @@
-﻿block extraHeader
+﻿extends layout
+block page
+  - var menu = 'room'
+block extraHeader
   script(type='text/javascript', src='js/easyrtc.js')
   script(type='text/javascript', src='js/alertify.min.js')
   script(type='text/javascript', src='js/room.js')
+  script(type='text/javascript', src='js/socket.io.js')
 block content
-  button#btnFindRoom(onclick='findRoom()') Find Room
+  button#btnFindRoom(onclick='connect()') Find Room
 
   table
       tr
