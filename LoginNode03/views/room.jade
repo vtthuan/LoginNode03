@@ -7,11 +7,14 @@ block extraHeader
   script(type='text/javascript', src='js/room.js')
   script(type='text/javascript', src='js/socket.io.js')
 block content
-  button#btnFindRoom(onclick='connect()') Find Room
+
+  | Hi #{user.email}, Do you want to find someone to chat ?   
 
   table
       tr
-        td                        
+        td   
+          - var userName = user.email
+          button#btnFindRoom(onclick='connect("#{userName}")') Find Room                     
           button#hangupButton(disabled='disabled', onclick='hangup()') Hangup
       |         
       tr

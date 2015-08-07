@@ -15,39 +15,42 @@ function enable(domId) {
     document.getElementById(domId).disabled = "";
 }
 
-function findRoom(){
+function findRoom(userName){
 
 }
 
-function connect() {
-    easyrtc.setVideoDims(640, 480);
-    easyrtc.setRoomOccupantListener(occupantListener);
-    easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
-    easyrtc.setAcceptChecker(function (easyrtcid, callback) {
-        alertify.confirm('Modal: false')
+function acceptChecker(easyrtcid, callback) {
+    alertify.confirm('Modal: false')
         .set('message', AskCallMessage)
         .set('modal', false)
         .set('onok', function () { acceptTheCall(true); })
         .set('oncancel', function () { acceptTheCall(false); })
         .autoCancel(30).show();
+    
+    callerPending = easyrtcid;
+    
+    var acceptTheCall = function (wasAccepted) {
         
-        callerPending = easyrtcid;
-        
-        var acceptTheCall = function (wasAccepted) {
-            
-            if (easyrtc.getConnectionCount() > 0) {
-                alert("Drop current call and accept new from " + easyrtc.idToName(easyrtcid) + " ?");
-            }
-            else {
-                alert("Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?");
-            }
-            if (wasAccepted && easyrtc.getConnectionCount() > 0) {
-                easyrtc.hangupAll();
-            }
-            callback(wasAccepted);
-            callerPending = null;
-        };
-    });
+        if (easyrtc.getConnectionCount() > 0) {
+            alert("Drop current call and accept new from " + easyrtc.idToName(easyrtcid) + " ?");
+        }
+        else {
+            alert("Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?");
+        }
+        if (wasAccepted && easyrtc.getConnectionCount() > 0) {
+            easyrtc.hangupAll();
+        }
+        callback(wasAccepted);
+        callerPending = null;
+    };
+}
+
+function connect(userName) {
+    easyrtc.setVideoDims(640, 480);
+    easyrtc.setUsername(userName);
+    easyrtc.setRoomOccupantListener(occupantListener);
+    easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
+    easyrtc.setAcceptChecker(acceptChecker);
 }
 
 function occupantListener(roomName, occupants, selfInfo) {
