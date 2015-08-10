@@ -16,7 +16,10 @@ function enable(domId) {
 }
 
 function findRoom(userName){
-
+    if (easyrtc.myEasyrtcid == "") {
+        connect(userName);
+    }
+    sendRequest("findRoom", null , receiveResponse, null);
 }
 
 function acceptChecker(easyrtcid, callback) {
@@ -48,9 +51,17 @@ function acceptChecker(easyrtcid, callback) {
 function connect(userName) {
     easyrtc.setVideoDims(640, 480);
     easyrtc.setUsername(userName);
+    easyrtc.setRoomEntryListener(roomEntryListener);
     easyrtc.setRoomOccupantListener(occupantListener);
     easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
     easyrtc.setAcceptChecker(acceptChecker);
+}
+
+var needToCallOtherUsers;
+function roomEntryListener(entry, roomName)
+{
+    needToCallOtherUsers = true;
+    alert("first time join room: " + needToCallOtherUsers);
 }
 
 function occupantListener(roomName, occupants, selfInfo) {
@@ -61,19 +72,19 @@ function occupantListener(roomName, occupants, selfInfo) {
     if (Object.keys(occupants).length > 1 || Object.keys(occupants).length === 0) {
         alert(Object.keys(occupants).length + "personnes");
         return; // trait the cas when a room has > 2 persones
-    }
+    }    
     
+    //var isLastOneJoin = true;
+    //for (aClient in occupants) {
+    //    if (selfInfo.roomJoinTime < occupants[aClient].roomJoinTime)
+    //        isLastOneJoin = false;
+    //}
     
-    var isLastOneJoin = true;
-    for (aClient in occupants) {
-        if (selfInfo.roomJoinTime < occupants[aClient].roomJoinTime)
-            isLastOneJoin = false;
-    }
-    
-    if (isLastOneJoin) {
+    if (needToCallOtherUsers) {
         for (var id in occupants)
             performCall(id);
     }
+    needToCallOtherUsers = false;
 }
 
 function setUpMirror() {
@@ -115,8 +126,6 @@ var joinRoom = function (roomData) {
     //already accept to join room, show waiting sign
     if (!roomData.isNew) {
         //show a box which contain 2 red points for 2 personnes
-        $(".waitingPanel").show("slow");
-        $("#circle1").addClass("active");
     }
     
     //join room
@@ -145,9 +154,9 @@ var quitRoom = function (idDialog) {
     //do something
 }
 
-function strStartsWith(str, prefix) {
-    return str.indexOf(prefix) === 0;
-}
+//function strStartsWith(str, prefix) {
+//    return str.indexOf(prefix) === 0;
+//}
 
 var receiveResponse = function (msgType, msgData) {
     switch (msgType) {
