@@ -6,13 +6,14 @@ block extraHeader
   script(type='text/javascript', src='js/alertify.min.js')
   script(type='text/javascript', src='js/room.js')
   script(type='text/javascript', src='js/socket.io.js')
+  link(rel='stylesheet', href="css/alertify.css")
 block content
 
   | Hi #{user.email}, Do you want to find someone to chat ?   
 
   table
       tr
-        td   
+        td
           - var userName = user.email
           button#btnFindRoom(onclick='findRoom("#{userName}")') Find Room                     
           button#hangupButton(disabled='disabled', onclick='hangup()') Hangup

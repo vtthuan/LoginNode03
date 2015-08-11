@@ -30,6 +30,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="config\easyrtc.js" />
     <Compile Include="config\passport.js" />
     <Compile Include="models\article.js" />
     <Compile Include="models\index.js" />
@@ -51,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="package.json" />
+    <Content Include="public\css\alertify.css" />
     <Content Include="public\css\bootstrap-3.0.2\css\bootstrap-theme.css" />
     <Content Include="public\css\bootstrap-3.0.2\css\bootstrap-theme.min.css" />
     <Content Include="public\css\bootstrap-3.0.2\css\bootstrap.css" />
