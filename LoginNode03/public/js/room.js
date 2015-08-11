@@ -5,9 +5,10 @@ var selfEasyrtcid = "";
 var haveSelfVideo = false;
 var waitingForRoomList = true;
 var isConnected = false;
+var isJoinedRoom = false;
 var AskCallMessage = "New member found. He wants to chat with you. Do you want to chat ?";
 var AskQuitRoom = "Do you really want to quit room ? ";
-var AskJoinRoom = "A room is found. Do you want to join? "
+var AskJoinRoom = "A partenaire was found. Do you want to chat with him?"
 
 function disable(domId) {
     document.getElementById(domId).disabled = "disabled";
@@ -17,12 +18,15 @@ function enable(domId) {
     document.getElementById(domId).disabled = "";
 }
 
-function findRoom(userName){
+function checkRoom(userName){
     if (easyrtc.myEasyrtcid == "") {
         connect(userName);
     }
-    else {        
-        openDialog(AskQuitRoom, null, quitRoom, null);        
+    else {
+        if (!isJoinedRoom)
+            findRoom();
+        else
+            openDialog(AskQuitRoom, null, quitRoom, null);        
     }    
 }
 
@@ -65,7 +69,7 @@ var needToCallOtherUsers;
 function roomEntryListener(entry, roomName)
 {
     needToCallOtherUsers = true;
-    alert("first time join room: " + needToCallOtherUsers);
+    
 }
 
 function occupantListener(roomName, occupants, selfInfo) {
@@ -74,15 +78,16 @@ function occupantListener(roomName, occupants, selfInfo) {
     }
     
     if (Object.keys(occupants).length > 1 || Object.keys(occupants).length === 0) {
-        alert(Object.keys(occupants).length + "personnes");
-        return; // trait the cas when a room has > 2 persones
+        needToCallOtherUsers = false;
     }
+    
+    document.getElementById("numberPersons").innerHTML = "number persons : " + Object.keys(occupants).length;
     
     if (needToCallOtherUsers) {
         for (var id in occupants)
             performCall(id);
     }
-    needToCallOtherUsers = false;
+    
 }
 
 function setUpMirror() {
@@ -96,7 +101,6 @@ function setUpMirror() {
 
 function performCall(otherEasyrtcid) {
     easyrtc.hangupAll();
-    alert('calling');
     var successCall = function () { alert('call success'); setUpMirror(); };
     var failureCall = function () { };
     easyrtc.call(otherEasyrtcid, successCall, failureCall);
@@ -132,6 +136,7 @@ var joinRoom = function (roomData) {
         
         document.getElementById("room").innerHTML = "User is waiting for a chat. His room name : " + roomData.roomName;        
         updatePresence();
+        isJoinedRoom = true;
     },
         function (errorCode, errorText) {
         easyrtc.showError(errorCode, errorText);
@@ -158,6 +163,7 @@ var receiveResponse = function (msgType, msgData) {
             }
             break;
         case "leaveRoom":
+            isJoinedRoom = false;
             findRoom();
             break;
     };
@@ -174,12 +180,12 @@ function loginSuccess(easyrtcid) {
     updatePresence();
     document.getElementById("name").innerHTML = "number Id : " + selfEasyrtcid;
     isConnected = true;
-    findRoom();  
+    findRoom();
 }
 
-var findRoom = function()
+var findRoom = function ()
 {
-    sendRequest("findRoom", null , receiveResponse, null);
+    sendRequest("findRoom", null , receiveResponse, null); 
 }
 
 easyrtc.setStreamAcceptor(function (easyrtcid, stream) {

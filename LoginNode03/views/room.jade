@@ -15,7 +15,7 @@ block content
       tr
         td
           - var userName = user.email
-          button#btnFindRoom(onclick='findRoom("#{userName}")') Find Room                     
+          button#btnFindRoom(onclick='checkRoom("#{userName}")') Find Room                     
           button#hangupButton(disabled='disabled', onclick='hangup()') Hangup
       |         
       tr
@@ -24,6 +24,8 @@ block content
         |             
         td
           #room
+          #numberPersons
+          #status
       |         
       tr
         td
