@@ -36,7 +36,31 @@ module.exports = function (easyrtc) {
         easyrtc.events.emitDefault("easyrtcMsg", connectionObj, msg, socketCallback, next);
     });
     
+    
+    easyrtc.events.on("roomLeave", 
+        function (connectionObj, roomName, next) {
+        var app = connectionObj.getApp();
+        app.getRoomOccupantCount(roomName, function (err, number) {
+            if (number < 2) {
+                app.deleteRoom(roomName, function (err, isDeleted) {
+                    if (err) {
+                        console.log(err);
+                        return false;
+                    }
+
+                    if (isDeleted) {
+                        console.log("The room" + roomName + "is deleted.");
+                    }
+                });
+                
+            }
+        });
+        next(null);
+    }
+    );
     easyrtc.setOption("roomDefaultEnable", false);
+
+
 
     
 }

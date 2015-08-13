@@ -30,31 +30,49 @@ function checkRoom(userName){
     }    
 }
 
-function acceptChecker(easyrtcid, callback) {
+var partenaireFound = function (easyrtcid)
+{
     alertify.confirm('Modal: false')
         .set('message', AskCallMessage)
         .set('modal', false)
-        .set('onok', function () { acceptTheCall(true); })
-        .set('oncancel', function () { acceptTheCall(false); })
+        .set('onok', function () { acceptTheCall(easyrtcid); })
+        .set('oncancel', function () { quitRoom(); })
         .autoCancel(30).show();
-    
-    callerPending = easyrtcid;
-    
-    var acceptTheCall = function (wasAccepted) {
-        
-        if (easyrtc.getConnectionCount() > 0) {
-            alert("Drop current call and accept new from " + easyrtc.idToName(easyrtcid) + " ?");
-        }
-        else {
-            alert("Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?");
-        }
-        if (wasAccepted && easyrtc.getConnectionCount() > 0) {
-            easyrtc.hangupAll();
-        }
-        callback(wasAccepted);
-        callerPending = null;
-    };
 }
+var acceptTheCall = function (easyrtcid) {
+    performCall(easyrtcid);
+    
+};
+
+//function acceptChecker(easyrtcid, callback) {
+//    alertify.confirm('Modal: false')
+//        .set('message', AskCallMessage)
+//        .set('modal', false)
+//        .set('onok', function () { acceptTheCall(true); })
+//        .set('oncancel', function () { acceptTheCall(false); })
+//        .autoCancel(30).show();
+
+//    callerPending = easyrtcid;
+//    var acceptTheCall = function (wasAccepted) {
+        
+//        if (easyrtc.getConnectionCount() > 0) {
+//            alert("Drop current call and accept new from " + easyrtc.idToName(easyrtcid) + " ?");
+//        }
+//        else {
+//            alert("Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?");
+//        }
+//        if (wasAccepted && easyrtc.getConnectionCount() > 0) {
+//            easyrtc.hangupAll();
+//        }
+//        callback(wasAccepted);
+//        callerPending = null;
+//    };
+//    //acceptTheCall();
+//    callback(wasAccepted);
+//    callerPending = null;
+    
+    
+//}
 
 function connect(userName) {
     easyrtc.setVideoDims(640, 480);
@@ -62,14 +80,14 @@ function connect(userName) {
     easyrtc.setRoomEntryListener(roomEntryListener);
     easyrtc.setRoomOccupantListener(occupantListener);
     easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
-    easyrtc.setAcceptChecker(acceptChecker);
+    //easyrtc.setAcceptChecker(acceptChecker);
 }
 
-var needToCallOtherUsers;
+var isNewConnection = false;
 function roomEntryListener(entry, roomName)
 {
-    needToCallOtherUsers = true;
-    
+    isNewConnection = true;
+    easyrtc.setRoomApiField(roomName, "isNewConnection", isNewConnection);
 }
 
 function occupantListener(roomName, occupants, selfInfo) {
@@ -77,17 +95,30 @@ function occupantListener(roomName, occupants, selfInfo) {
         return;
     }
     
+    //only one person in room, not new anymore
     if (Object.keys(occupants).length > 1 || Object.keys(occupants).length === 0) {
-        needToCallOtherUsers = false;
+        isNewConnection = false;
+        easyrtc.setRoomApiField(roomName, "isNewConnection", false);
+        return;
+    }   
+    
+    //new connection doesn't contain field isNewConnection
+    if (!isNewConnection && ( !occupants[0].apiField != undefined || occupants.valueOf(0).apiField.isNewConnection)) {
+        partenaireFound(occupants.valueOf(0).easyrtcid);
     }
     
-    document.getElementById("numberPersons").innerHTML = "number persons : " + Object.keys(occupants).length;
+    //indique that the user is not new anymore
+    if (selfInfo.apiField != undefined && selfInfo.apiField.isNewConnection.fieldValue)
+        easyrtc.setRoomApiField(roomName, "isNewConnection", false);
+
+    document.getElementById("numberPersons").innerHTML = "number persons : " + Object.keys(occupants).length + 1;
     
-    if (needToCallOtherUsers) {
-        for (var id in occupants)
-            performCall(id);
-    }
+    //if (needToCallOtherUsers) {
+    //    for (var id in occupants)
+    //        performCall(id);
+    //}
     
+
 }
 
 function setUpMirror() {
