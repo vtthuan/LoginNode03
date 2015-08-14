@@ -10,6 +10,15 @@ var AskCallMessage = "New member found. He wants to chat with you. Do you want t
 var AskQuitRoom = "Do you really want to quit room ? ";
 var AskJoinRoom = "A partenaire was found. Do you want to chat with him?"
 
+window.onbeforeunload = function () {
+    alertify.confirm('Modal: false')
+        .set('message', AskQuitRoom)
+        .set('modal', false)
+        .set('onok', function () { alert('quit room'); quitRoom(); })
+        .set('oncancel', function () { alert('do nothing');})
+        .autoCancel(30).show();
+}
+
 function disable(domId) {
     document.getElementById(domId).disabled = "disabled";
 }
@@ -41,38 +50,7 @@ var partenaireFound = function (easyrtcid)
 }
 var acceptTheCall = function (easyrtcid) {
     performCall(easyrtcid);
-    
 };
-
-//function acceptChecker(easyrtcid, callback) {
-//    alertify.confirm('Modal: false')
-//        .set('message', AskCallMessage)
-//        .set('modal', false)
-//        .set('onok', function () { acceptTheCall(true); })
-//        .set('oncancel', function () { acceptTheCall(false); })
-//        .autoCancel(30).show();
-
-//    callerPending = easyrtcid;
-//    var acceptTheCall = function (wasAccepted) {
-        
-//        if (easyrtc.getConnectionCount() > 0) {
-//            alert("Drop current call and accept new from " + easyrtc.idToName(easyrtcid) + " ?");
-//        }
-//        else {
-//            alert("Accept incoming call from " + easyrtc.idToName(easyrtcid) + " ?");
-//        }
-//        if (wasAccepted && easyrtc.getConnectionCount() > 0) {
-//            easyrtc.hangupAll();
-//        }
-//        callback(wasAccepted);
-//        callerPending = null;
-//    };
-//    //acceptTheCall();
-//    callback(wasAccepted);
-//    callerPending = null;
-    
-    
-//}
 
 function connect(userName) {
     easyrtc.setVideoDims(640, 480);
@@ -80,7 +58,6 @@ function connect(userName) {
     easyrtc.setRoomEntryListener(roomEntryListener);
     easyrtc.setRoomOccupantListener(occupantListener);
     easyrtc.connect("CampusLanguage", loginSuccess, loginFailure);
-    //easyrtc.setAcceptChecker(acceptChecker);
 }
 
 var isNewConnection = false;
@@ -103,22 +80,17 @@ function occupantListener(roomName, occupants, selfInfo) {
     }   
     
     //new connection doesn't contain field isNewConnection
-    if (!isNewConnection && ( !occupants[0].apiField != undefined || occupants.valueOf(0).apiField.isNewConnection)) {
-        partenaireFound(occupants.valueOf(0).easyrtcid);
+    if (!isNewConnection && 
+        (!occupants[Object.keys(occupants)[0]].apiField != undefined || occupants[Object.keys(occupants)[0]].apiField.isNewConnection)) {
+        partenaireFound(occupants[Object.keys(occupants)[0]].easyrtcid);
     }
     
     //indique that the user is not new anymore
     if (selfInfo.apiField != undefined && selfInfo.apiField.isNewConnection.fieldValue)
         easyrtc.setRoomApiField(roomName, "isNewConnection", false);
 
-    document.getElementById("numberPersons").innerHTML = "number persons : " + Object.keys(occupants).length + 1;
+    document.getElementById("numberPersons").innerHTML = "number persons : " + (Object.keys(occupants).length + 1);
     
-    //if (needToCallOtherUsers) {
-    //    for (var id in occupants)
-    //        performCall(id);
-    //}
-    
-
 }
 
 function setUpMirror() {
@@ -180,7 +152,7 @@ var askToJoin = function (roomData) {
     }
 }
 
-var quitRoom = function (idDialog) {
+var quitRoom = function () {
     sendRequest("leaveRoom", null , receiveResponse, null);
 }
 

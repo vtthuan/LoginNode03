@@ -58,6 +58,13 @@ module.exports = function (easyrtc) {
         next(null);
     }
     );
+    
+    easyrtc.events.on("disconnect", 
+        function (connectionObj, next) {
+        console.info('lost connection');
+        next(null);
+    });
+
     easyrtc.setOption("roomDefaultEnable", false);
 
 
